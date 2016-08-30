@@ -5,19 +5,20 @@
 
 import json
 
-from pushchamp.constants import PushchampConstants, SupportedChannel
+from pushchamp.constants import PushchampConstants, SupportedChannels
 from pushchamp.exceptions import EmptyChannel, InvalidType
 from urllib2 import Request, urlopen
 
 
 class Pushchamp(object):
     """create an object to use APIs"""
-    def __init__(self):
+    def __init__(self, token, **kwargs):
         super(Pushchamp, self).__init__()
-        self.template_vars = {}
-        self.address_params = {}
-        self.template_name = ""
-        self.request_name = ""
+        self.token = token
+        self.template_vars = kwargs.get("template_vars", {})
+        self.address_params = kwargs.get("addr_params", {})
+        self.template_name = kwargs.get("template_name", "")
+        self.request_name = kwargs.get("request_name", "")
 
     def set_template_vars(self, template_vars):
         """pass a dict to set template variables"""
@@ -45,9 +46,9 @@ class Pushchamp(object):
         if not isinstance(mobile_numbers, list):
             raise InvalidType("mobile_numbers", list, type(mobile_numbers))
 
-        if not self.address_params.get(SupportedChannel.SMS, {}):
-            self.address_params[SupportedChannel.SMS] = {}
-        self.address_params[SupportedChannel.SMS]["mobiles"] = mobile_numbers
+        if not self.address_params.get(SupportedChannels.SMS, {}):
+            self.address_params[SupportedChannels.SMS] = {}
+        self.address_params[SupportedChannels.SMS]["mobiles"] = mobile_numbers
 
     def send(self):
         """send a message to end user(defined by address_params)"""
@@ -55,7 +56,7 @@ class Pushchamp(object):
             raise EmptyChannel("You haven't provided any channel to send this message on.")
 
         channel_selected = False
-        for _, channel in SupportedChannel.GetChannels():
+        for _, channel in SupportedChannels.get_channels():
             if self.address_params.get(channel, {}):
                 channel_selected = True
 
@@ -70,7 +71,7 @@ class Pushchamp(object):
 
         headers = {
             "Content-Type": "application/json",
-            "token": "<pushchamp_token>"
+            "token": self.token
         }
         data = {
             "template_vars": self.template_vars,

@@ -2,15 +2,14 @@
     Constants to be used throughout this project.
 """
 
-class SupportedChannel(object):
+class SupportedChannels(object):
     """channels supported by PushChamp"""
     SMS = "sms"
 
     @staticmethod
-    def GetChannels():
-        return [
-            SupportedChannel.SMS
-        ]
+    def get_channels():
+        """return list of all channels supported by this SDK"""
+        return [SupportedChannels.SMS]
 
 class PushchampConstants(object):
     """some constants defined by pushchamp"""
